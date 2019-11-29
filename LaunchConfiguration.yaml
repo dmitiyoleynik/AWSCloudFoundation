@@ -1,0 +1,22 @@
+Resources:
+  MyLC:
+    Type: "AWS::AutoScaling::LaunchConfiguration"
+    Properties: 
+      ImageId: "ami-0cc0a36f626a4fdf5"
+      InstanceType: "t2.micro"
+      KeyName: "matrix"
+      LaunchConfigurationName: "AutoLC-1"
+      PlacementTenancy: "default"
+      SecurityGroups: 
+        - "launch-wizard-2"
+      UserData:
+        Fn::Base64:
+          !Sub | 
+            #!/bin/bash
+            sudo apt-get update -y
+            sudo apt-get install nginx -y
+            ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
+            sudo touch /var/www/html/index.html
+            sudo chmod 777 /var/www/html/index.html
+            echo "$ip4" > /var/www/html/index.html
+            sudo service nginx restart

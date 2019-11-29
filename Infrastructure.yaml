@@ -1,0 +1,52 @@
+Resources:
+  MyLC:
+    Type: "AWS::AutoScaling::LaunchConfiguration"
+    DependsOn: "MyLB"
+    Properties: 
+      ImageId: "ami-0cc0a36f626a4fdf5"
+      InstanceType: "t2.micro"
+      KeyName: "matrix"
+      LaunchConfigurationName: "AutoLC-1"
+      PlacementTenancy: "default"
+      SecurityGroups: 
+        - "launch-wizard-2"
+      UserData:
+        Fn::Base64:
+          !Sub | 
+            #!/bin/bash
+            sudo apt-get update -y
+            sudo apt-get install nginx -y
+            ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
+            sudo touch /var/www/html/index.html
+            sudo chmod 777 /var/www/html/index.html
+            echo "$ip4" > /var/www/html/index.html
+            sudo service nginx restart
+  MyLB:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties: 
+      Listeners: 
+        - LoadBalancerPort: "80"
+          InstancePort: "80"
+          Protocol: "HTTP"
+      LoadBalancerName: "AutoLB-1"
+      Subnets:
+        - subnet-0339287e
+        - subnet-31f4107d
+        - subnet-5760bb3d
+      SecurityGroups: 
+        - "sg-0eb7374edf5105b8d"
+  MyASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn: "MyLC"
+    Properties: 
+      AutoScalingGroupName: "AutoASG-1"
+      AvailabilityZones:
+        - eu-central-1a
+        - eu-central-1b
+        - eu-central-1c
+      HealthCheckGracePeriod: 200
+      LaunchConfigurationName: "AutoLC-1"
+      LoadBalancerNames: 
+        - "AutoLB-1"
+      MaxSize: 2
+      MinSize: 1

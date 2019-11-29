@@ -1,0 +1,15 @@
+Resources:
+  MyASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties: 
+      AutoScalingGroupName: "AutoASG-1"
+      AvailabilityZones:
+        - euc1-az2
+        - euc1-az3
+        - euc1-az1
+      HealthCheckGracePeriod: 200
+      LaunchConfigurationName: "MyLC"
+      LoadBalancerNames: 
+        - "MyLB"
+      MaxSize: 2
+      MinSize: 1

@@ -1,0 +1,15 @@
+Resources:
+  MyLB:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties: 
+      Listeners: 
+        - LoadBalancerPort: "80"
+          InstancePort: "80"
+          Protocol: "HTTP"
+      LoadBalancerName: "AutoLB-1"
+      Subnets:
+        - subnet-0339287e
+        - subnet-31f4107d
+        - subnet-5760bb3d
+      SecurityGroups: 
+        - "sg-0eb7374edf5105b8d"
