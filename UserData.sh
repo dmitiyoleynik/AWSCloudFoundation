@@ -7,5 +7,7 @@ sudo chmod 777 /var/www/html/index.html
 echo "$ip4" > /var/www/html/index.html
 sudo service nginx restart
 
-
-${!GetAtt Endpoint.Address}
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py runserver
+python3 manage.py runserver 0.0.0.0:5000

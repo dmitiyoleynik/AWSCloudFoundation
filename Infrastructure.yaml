@@ -25,13 +25,19 @@ Resources:
         Fn::Base64:
           !Sub | 
             #!/bin/bash
-            sudo apt-get update -y
-            sudo apt-get install nginx -y
-            ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
-            sudo touch /var/www/html/index.html
-            sudo chmod 777 /var/www/html/index.html
-            echo ${MyDB.Endpoint.Address} > /var/www/html/index.html
-            sudo service nginx restart
+            sudo apt-get update
+            sudo apt-get upgrade -y
+            sudo apt-get install python3 -y
+            sudo apt-get install python3-pip -y
+            sudo pip3 install Django==2.1.7
+            sudo pip3 install pymysql
+            git clone https://github.com/dmitiyoleynik/python
+            cd python
+            python3 replace.py MySQLDB root rootpwd111 ${MyDB.Endpoint.Address}
+            cd hello
+            python3 manage.py makemigrations
+            python3 manage.py migrate
+            python3 manage.py runserver 0.0.0.0:5000
   MyLB:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     DependsOn: "MyDB"
