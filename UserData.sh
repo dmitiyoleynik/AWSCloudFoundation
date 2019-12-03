@@ -6,3 +6,6 @@ sudo touch /var/www/html/index.html
 sudo chmod 777 /var/www/html/index.html
 echo "$ip4" > /var/www/html/index.html
 sudo service nginx restart
+
+
+${!GetAtt Endpoint.Address}

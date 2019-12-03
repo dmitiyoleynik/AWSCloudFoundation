@@ -1,4 +1,15 @@
 Resources:
+  MyDB:
+    Type: "AWS::RDS::DBInstance"
+    Properties: 
+      AllocatedStorage: "20"
+      AvailabilityZone: "eu-central-1a"
+      DBInstanceClass: "db.t2.micro"
+      DBName: "MySQLDB"
+      Engine: "mysql"
+      EngineVersion: "5.7.19"
+      MasterUsername: "root"
+      MasterUserPassword: "rootpwd111"
   MyLC:
     Type: "AWS::AutoScaling::LaunchConfiguration"
     DependsOn: "MyLB"
@@ -19,10 +30,11 @@ Resources:
             ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
             sudo touch /var/www/html/index.html
             sudo chmod 777 /var/www/html/index.html
-            echo "$ip4" > /var/www/html/index.html
+            echo ${MyDB.Endpoint.Address} > /var/www/html/index.html
             sudo service nginx restart
   MyLB:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
+    DependsOn: "MyDB"
     Properties: 
       Listeners: 
         - LoadBalancerPort: "80"
