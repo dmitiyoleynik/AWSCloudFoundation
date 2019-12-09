@@ -28,6 +28,7 @@ Resources:
             cd /home/ubuntu
             sudo apt-get update
             sudo apt-get upgrade -y
+            sudo apt-get install nginx -y
             sudo apt-get install python3 -y
             sudo apt-get install python3-pip -y
             sudo pip3 install Django==2.1.7 
@@ -45,7 +46,7 @@ Resources:
     Properties: 
       Listeners: 
         - LoadBalancerPort: "80"
-          InstancePort: "80"
+          InstancePort: "5000"
           Protocol: "HTTP"
       LoadBalancerName: "AutoLB-1"
       Subnets:
