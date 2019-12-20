@@ -8,8 +8,8 @@ Resources:
       DBName: "MySQLDB"
       Engine: "mysql"
       EngineVersion: "5.7.19"
-      MasterUsername: "root"
-      MasterUserPassword: "rootpwd111"
+      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref MySecret, ':SecretString:username}}' ]]
+      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref MySecret, ':SecretString:password}}' ]]
   MyLC:
     Type: "AWS::AutoScaling::LaunchConfiguration"
     DependsOn: "MyLB"
@@ -48,6 +48,12 @@ Resources:
         - LoadBalancerPort: "80"
           InstancePort: "5000"
           Protocol: "HTTP"
+      HealthCheck:
+        HealthyThreshold: 10
+        Interval: 30
+        Target: "TCP:80"
+        Timeout: 5 
+        UnhealthyThreshold: 2
       LoadBalancerName: "AutoLB-1"
       Subnets:
         - subnet-0339287e
@@ -70,3 +76,18 @@ Resources:
         - "AutoLB-1"
       MaxSize: 2
       MinSize: 1
+  MySecret:      
+    Type: AWS::SecretsManager::Secret
+    Properties: 
+      Description: "Secret key for RDS instance"
+      GenerateSecretString: 
+        SecretStringTemplate: '{"username": "admin"}'
+        GenerateStringKey: 'password'
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+  MySecretAttachment:      
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId: !Ref MySecret
+      TargetId: !Ref MyDB
+      TargetType: AWS::RDS::DBInstance

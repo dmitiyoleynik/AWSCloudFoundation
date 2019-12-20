@@ -4,7 +4,7 @@ Resources:
     Properties: 
       Listeners: 
         - LoadBalancerPort: "80"
-          InstancePort: "80"
+          InstancePort: "5000"
           Protocol: "HTTP"
       LoadBalancerName: "AutoLB-1"
       Subnets:
